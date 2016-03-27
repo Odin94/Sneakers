@@ -19,8 +19,7 @@ BasicGame.Game.prototype = {
 
     update: function () {
         this.checkCollisions();
-        this.setWatcherMovement();
-        this.checkWatcherVision();
+        this.updateWatchers();
         this.processPlayerInput();
         this.processDelayedEffects();
     },
@@ -66,12 +65,12 @@ BasicGame.Game.prototype = {
 
 
         /*for (var i = 6; i < 15; i += 3) {
-            this.spawnWatcher(i, 2);
-        }
+         this.spawnWatcher(i, 2);
+         }
 
-        for (var i = 6; i < 15; i += 6) {
-            this.spawnWatcher(i, 8);
-        }*/
+         for (var i = 6; i < 15; i += 6) {
+         this.spawnWatcher(i, 8);
+         }*/
 
         this.spawnWatcher(6, 8);
     },
@@ -198,14 +197,18 @@ BasicGame.Game.prototype = {
         this.game.add.image(0, 0, this.bitmap);
     },
 
+    updateWatchers: function () {
+        this.setWatcherMovement();
+        this.checkWatcherVision();
+
+        this.watcherPool.forEachAlive(function (watcher) {
+            Watcher.updateLastPos(watcher);
+        }, this);
+    },
+
     setWatcherMovement: function () {
         this.watcherPool.forEachAlive(function (watcher) {
-            if (watcher.positionChangeTime < this.time.now) {
-                watcher.positionChangeTime = this.time.now +
-                    this.rnd.integerInRange(BasicGame.WATCHER_MOVE_DELAY_MIN, BasicGame.WATCHER_MOVE_DELAY_MAX);
-
-                Watcher.patrol(watcher);
-            }
+            Watcher.patrol(watcher);
         }, this);
     },
 
@@ -214,8 +217,7 @@ BasicGame.Game.prototype = {
         /*        this.physics.arcade.overlap(
          this.bulletPool, this.enemyPool, this.enemyHit, null, this
          );*/
-    }
-    ,
+    },
 
 //from gamemechanicsexplorer
     checkWatcherVision: function () {
