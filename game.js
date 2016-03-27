@@ -29,6 +29,18 @@ BasicGame.Game.prototype = {
     },
 
     setupMap: function () {
+        this.setupWalls();
+        this.setupGoals();
+    },
+
+    setupGoals: function () {
+        this.goal = this.add.sprite(this.game.width / 2, 0 + 50, 'goal');
+        this.goal.anchor.setTo(0.5, 0.5);
+
+        this.physics.enable(this.goal, Phaser.Physics.ARCADE);
+    },
+
+    setupWalls: function () {
         this.wallPool = this.add.group();
         this.wallPool.enableBody = true;
         this.wallPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -214,9 +226,13 @@ BasicGame.Game.prototype = {
 
     checkCollisions: function () {
         this.physics.arcade.collide(this.player, this.wallPool);
-        /*        this.physics.arcade.overlap(
-         this.bulletPool, this.enemyPool, this.enemyHit, null, this
-         );*/
+        this.physics.arcade.overlap(
+            this.player, this.goal, this.loadNextLevel, null, this
+        );
+    },
+
+    loadNextLevel: function () {
+        window.alert("You win!");
     },
 
 //from gamemechanicsexplorer
@@ -253,8 +269,9 @@ BasicGame.Game.prototype = {
                 visionAngleDiff -= 360;
             }
 
-            // if player isn't in watcher's vision, return
+            // if player isn't in watcher's cone of vision, return
             if (!(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
+                watcher.tint = 0xffffff;
                 return null;
             }
 
@@ -276,18 +293,23 @@ BasicGame.Game.prototype = {
                 this.bitmap.context.moveTo(watcher.x, watcher.y);
                 this.bitmap.context.lineTo(this.player.x, this.player.y);
                 this.bitmap.context.stroke();
+
+                this.onPlayerSpotted();
             }
         }, this);
 
         // This just tells the engine it should update the texture cache
         this.bitmap.dirty = true;
-    }
-    ,
+    },
+
+    onPlayerSpotted: function () {
+        this.player.x = this.game.width / 2;
+        this.player.y = this.game.height - 50;
+    },
 
     render: function () {
 
-    }
-    ,
+    },
 
 
     processPlayerInput: function () {
