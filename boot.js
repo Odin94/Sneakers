@@ -9,6 +9,7 @@ var BasicGame = {
     WATCHER_MOVE_DELAY_MIN: Phaser.Timer.SECOND * 1,
     WATCHER_MOVE_DELAY_MAX: Phaser.Timer.SECOND * 3,
     WATCHER_MOVE_SPEED: 150,
+    WATCHER_SPOT_TIME: Phaser.Timer.SECOND * 0.5,
 
     SEA_SCROLL_SPEED: 12,
     PLAYER_SPEED: 200,

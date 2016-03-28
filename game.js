@@ -34,7 +34,7 @@ BasicGame.Game.prototype = {
     },
 
     setupGoals: function () {
-        this.goal = this.add.sprite(this.game.width / 2, 0 + 50, 'goal');
+        this.goal = this.add.sprite(this.game.width / 2, 50, 'goal');
         this.goal.anchor.setTo(0.5, 0.5);
 
         this.physics.enable(this.goal, Phaser.Physics.ARCADE);
@@ -269,18 +269,17 @@ BasicGame.Game.prototype = {
                 visionAngleDiff -= 360;
             }
 
-            // if player isn't in watcher's cone of vision, return
-            if (!(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
-                watcher.tint = 0xffffff;
-                return null;
-            }
-
-            // Test if any walls intersect the ray
             var intersect = this.getWallIntersection(ray);
 
-            if (intersect) {
-                // A wall is blocking this persons vision so change them back to their default color
+            // if player isn't in watcher's cone of vision, return
+            if (intersect || !(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
                 watcher.tint = 0xffffff;
+
+                if (watcher.spotsPlayer) {
+                    watcher.spotsPlayer = false;
+                }
+
+                return null;
             } else {
                 // This watcher can see the player so change their color
                 watcher.tint = 0xffaaaa;
@@ -294,7 +293,7 @@ BasicGame.Game.prototype = {
                 this.bitmap.context.lineTo(this.player.x, this.player.y);
                 this.bitmap.context.stroke();
 
-                this.onPlayerSpotted();
+                this.onPlayerSpotted(watcher);
             }
         }, this);
 
@@ -302,9 +301,16 @@ BasicGame.Game.prototype = {
         this.bitmap.dirty = true;
     },
 
-    onPlayerSpotted: function () {
-        this.player.x = this.game.width / 2;
-        this.player.y = this.game.height - 50;
+    onPlayerSpotted: function (watcher) {
+        if (watcher.spotsPlayer) {
+            if (watcher.spotTimer < this.time.now) {
+                this.player.x = this.game.width / 2;
+                this.player.y = this.game.height - 50;
+            }
+        } else {
+            watcher.spotsPlayer = true;
+            watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
+        }
     },
 
     render: function () {

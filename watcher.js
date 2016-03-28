@@ -14,25 +14,32 @@ var Watcher = {
         watcher.lastPosX = watcher.x;
         watcher.lastPosY = watcher.y;
 
-        watcher.patrolPositions = [[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
+        watcher.patrolActions = [new Action.moveAction(watcher.x + 200, watcher.y), new Action.turnAction(Math.PI)
+            , new Action.moveAction(watcher.x, watcher.y)];//[[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
         watcher.patrolPosIterator = 0;
 
         watcher.patrolStatus = "waiting";
+
+        watcher.spotsPlayer = false;
+        watcher.spotTimer = 0;
     },
 
     // if current patrol-destination has been reached, move to next patrol-destination
     patrol: function (watcher) {
         if (watcher.patrolStatus === "waiting") {
             if (window.game.time.now > watcher.positionChangeTime) {
-                var nextTarPos = watcher.patrolPositions[watcher.patrolPosIterator];
-                watcher.patrolPosIterator = (watcher.patrolPosIterator + 1) % watcher.patrolPositions.length;
+                var patrolAction = watcher.patrolActions[watcher.patrolPosIterator];
+                watcher.patrolPosIterator = (watcher.patrolPosIterator + 1) % watcher.patrolActions.length;
 
                 watcher.patrolStatus = "moving";
-                this.turnAndMoveToPos(watcher, nextTarPos[0], nextTarPos[1]);
+                patrolAction.execute(watcher);
             }
         }
         else if (watcher.patrolStatus === "moving") {
             if (this.reachedDestination(watcher)) {
+                watcher.x = watcher.destX;
+                watcher.y = watcher.destY;
+
                 watcher.positionChangeTime = window.game.time.now
                     + window.game.rnd.integerInRange(BasicGame.WATCHER_MOVE_DELAY_MIN, BasicGame.WATCHER_MOVE_DELAY_MAX);
 
@@ -46,7 +53,7 @@ var Watcher = {
         var distanceToDest = Math.abs(Phaser.Math.distance(watcher.x, watcher.y, watcher.destX, watcher.destY));
         var distanceTravelled = Math.abs(Phaser.Math.distance(watcher.x, watcher.y, watcher.lastPosX, watcher.lastPosY));
 
-        return distanceToDest < distanceTravelled;
+        return distanceToDest < distanceTravelled || Math.abs(Phaser.Math.distance(watcher.x, watcher.y, watcher.destX, watcher.destY)) <= 5;
     },
 
     turnAndMoveToPos: function (watcher, x, y) {
@@ -60,7 +67,7 @@ var Watcher = {
         watcher.destX = watcher.x;
         watcher.destY = watcher.y;
 
-        watcher.body.velocity.setTo(0,0);
+        watcher.body.velocity.setTo(0, 0);
         //watcher.velocity.x = 0;
         //watcher.velocity.y = 0;
     },
