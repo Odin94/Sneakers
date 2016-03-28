@@ -170,6 +170,13 @@ BasicGame.Game.prototype = {
     ,
 
     setupText: function () {
+        this.spottedTimerText = this.add.text(this.game.width / 2, this.game.height / 2 - 50, ""
+            , {
+                font: '60px monospace', fill: '#fff', align: 'center'
+            });
+        this.spottedTimerText.anchor.setTo(0.5, 0.5);
+
+
         this.instructions = this.add.text(
             this.game.width / 2,
             this.game.height - 100,
@@ -277,6 +284,7 @@ BasicGame.Game.prototype = {
 
                 if (watcher.spotsPlayer) {
                     watcher.spotsPlayer = false;
+                    this.spottedTimerText.text = "";
                 }
 
                 return null;
@@ -303,6 +311,7 @@ BasicGame.Game.prototype = {
 
     onPlayerSpotted: function (watcher) {
         if (watcher.spotsPlayer) {
+            this.spottedTimerText.text = (Math.round((this.time.now - watcher.spotTimer) / 1000 * 100) / 100).toFixed(2);
             if (watcher.spotTimer < this.time.now) {
                 this.player.x = this.game.width / 2;
                 this.player.y = this.game.height - 50;
