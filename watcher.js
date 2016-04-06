@@ -4,7 +4,7 @@
 
 var Watcher = {
 
-    setWatcher: function (watcher) {
+    setWatcher: function (watcher, patrolActionsData) {
         window.game.physics.enable(watcher, Phaser.Physics.ARCADE);
         watcher.positionChangeTime = 0;
 
@@ -14,8 +14,8 @@ var Watcher = {
         watcher.lastPosX = watcher.x;
         watcher.lastPosY = watcher.y;
 
-        watcher.patrolActions = [new Action.moveAction(watcher.x + 200, watcher.y), new Action.turnAction(Math.PI)
-            , new Action.moveAction(watcher.x, watcher.y)];//[[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
+        watcher.patrolActions = Action.generateActions(patrolActionsData);//[new Action.moveAction(watcher.x + 200, watcher.y), new Action.turnAction(Math.PI)
+           // , new Action.moveAction(watcher.x, watcher.y)];//[[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
         watcher.patrolPosIterator = 0;
 
         watcher.patrolStatus = "waiting";

@@ -4,17 +4,31 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
 
-
     create: function () {
         this.setupBackground();
-        this.setupMap();
-        this.setupWatchers();
-        this.setupPlayer();
+        this.createLevel("level1");
         this.setupPlayerIcons();
         this.setupText();
         this.setupLines();
 
         this.cursors = this.input.keyboard.createCursorKeys();
+    },
+
+    createLevel: function (filename) {
+        /**
+         * @param levelData
+         * @param levelData.playerSpawn
+         * @param levelData.walls
+         * @param levelData.walls.startX
+         * @param levelData.walls.endX
+         * @param levelData.walls.startY
+         * @param levelData.watchers
+         */
+        this.levelData = JSON.parse(this.game.cache.getText(filename));
+
+        this.setupMap();
+        this.setupWatchers();
+        this.setupPlayer();
     },
 
     update: function () {
@@ -34,7 +48,9 @@ BasicGame.Game.prototype = {
     },
 
     setupGoals: function () {
-        this.goal = this.add.sprite(this.game.width / 2, 50, 'goal');
+        var goalData = this.levelData.goal;
+
+        this.goal = this.add.sprite(goalData.x, goalData.y, 'goal');
         this.goal.anchor.setTo(0.5, 0.5);
 
         this.physics.enable(this.goal, Phaser.Physics.ARCADE);
@@ -51,12 +67,12 @@ BasicGame.Game.prototype = {
             wall.body.immovable = true;
         });
 
-        var wallPositions = [[0, 14, 6], [9, 14, 14], [3, 9, 8], [12, 9, 18], [5, 6, 18], [5, 3, 15]];
+        var walls = this.levelData.walls;
 
-        for (var i = 0; i < wallPositions.length; i++) {
-            var pos = wallPositions[i];
-            for (var j = pos[0]; j < pos[2]; j++) {
-                this.spawnWall(j, pos[1]);
+        for (var i = 0; i < walls.length; i++) {
+            var wall = walls[i];
+            for (var j = wall.startX; j < wall.endX; j++) {
+                this.spawnWall(j, wall.startY);
             }
         }
     },
@@ -75,24 +91,19 @@ BasicGame.Game.prototype = {
         this.watcherPool.setAll('anchor.x', 0.5);
         this.watcherPool.setAll('anchor.y', 0.5);
 
+        var watchers = this.levelData.watchers;
 
-        /*for (var i = 6; i < 15; i += 3) {
-         this.spawnWatcher(i, 2);
-         }
-
-         for (var i = 6; i < 15; i += 6) {
-         this.spawnWatcher(i, 8);
-         }*/
-
-        this.spawnWatcher(6, 8);
+        for (var i = 0; i < watchers.length; i++) {
+            this.spawnWatcher(watchers[i]);
+        }
     },
 
-    spawnWatcher: function (x, y) {
+    spawnWatcher: function (watcherData) {
         if (this.watcherPool.countDead() > 0) {
             var watcher = this.watcherPool.getFirstExists(false);
 
-            watcher.reset(x * BasicGame.WALL_WIDTH, y * BasicGame.WALL_HEIGHT);
-            Watcher.setWatcher(watcher);
+            watcher.reset(watcherData.x * BasicGame.WALL_WIDTH, watcherData.y * BasicGame.WALL_HEIGHT);
+            Watcher.setWatcher(watcher, watcherData.patrolActions);
         }
     },
 
@@ -132,7 +143,7 @@ BasicGame.Game.prototype = {
     },
 
     setupPlayer: function () {
-        this.player = this.add.sprite(this.game.width / 2, this.game.height - 50, 'player');
+        this.player = this.add.sprite(this.levelData.playerSpawn.x, this.levelData.playerSpawn.y, 'player');
         this.player.anchor.setTo(0.5, 0.5);
 
         this.player.animations.add('fly', [0, 1, 2], 20, true);
@@ -175,6 +186,7 @@ BasicGame.Game.prototype = {
                 font: '60px monospace', fill: '#fff', align: 'center'
             });
         this.spottedTimerText.anchor.setTo(0.5, 0.5);
+        this.spottedTimerText.alpha = 0.75;
 
 
         this.instructions = this.add.text(
