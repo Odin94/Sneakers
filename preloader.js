@@ -49,6 +49,7 @@ BasicGame.Preloader.prototype = {
 
         //preload levels
         this.load.text('level1', 'assets/levels/level1.json');
+        this.load.text('level2', 'assets/levels/level2.json');
     },
 
     create: function () {

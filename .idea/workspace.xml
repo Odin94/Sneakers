@@ -2,11 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="080b0a35-b1c8-4103-a01d-69aebb0be850" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/assets/levels/level2.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/action.js" afterPath="$PROJECT_DIR$/action.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game.js" afterPath="$PROJECT_DIR$/game.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/preloader.js" afterPath="$PROJECT_DIR$/preloader.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/watcher.js" afterPath="$PROJECT_DIR$/watcher.js" />
     </list>
     <ignored path="Sneakers.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -40,11 +39,21 @@
       <file leaf-file-name="game.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.32254463">
-              <caret line="42" column="6" selection-start-line="42" selection-start-column="6" selection-end-line="42" selection-end-column="6" />
+            <state vertical-scroll-proportion="0.44419643">
+              <caret line="263" column="24" selection-start-line="263" selection-start-column="24" selection-end-line="263" selection-end-column="24" />
               <folding>
-                <element signature="e#369#644#0" expanded="false" />
+                <element signature="e#401#676#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="level2.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/levels/level2.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-21.62069">
+              <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -65,7 +74,7 @@
         <entry file="file://$PROJECT_DIR$/assets/levels/level1.json">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="-3.4482758">
-              <caret line="7" column="11" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
+              <caret line="7" column="11" selection-start-line="0" selection-start-column="0" selection-end-line="63" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -97,7 +106,7 @@
         <entry file="file://$PROJECT_DIR$/preloader.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="50" column="62" selection-start-line="50" selection-start-column="62" selection-end-line="50" selection-end-column="62" />
+              <caret line="51" column="54" selection-start-line="51" selection-start-column="54" selection-end-line="51" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -144,10 +153,11 @@
         <option value="$PROJECT_DIR$/index.html" />
         <option value="chrome-extension://cjpalhdlnbpafiamejdnhcphjbkeiagm/js/contentscript-end.js" />
         <option value="$PROJECT_DIR$/boot.js" />
-        <option value="$PROJECT_DIR$/preloader.js" />
         <option value="$PROJECT_DIR$/watcher.js" />
         <option value="$PROJECT_DIR$/action.js" />
         <option value="$PROJECT_DIR$/assets/levels/level1.json" />
+        <option value="$PROJECT_DIR$/assets/levels/level2.json" />
+        <option value="$PROJECT_DIR$/preloader.js" />
         <option value="$PROJECT_DIR$/game.js" />
       </list>
     </option>
@@ -372,14 +382,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/boot.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="9" column="28" selection-start-line="9" selection-start-column="28" selection-end-line="9" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/preloader.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -417,7 +419,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -467,7 +469,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -517,7 +519,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -567,7 +569,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -617,7 +619,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -667,7 +669,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -741,14 +743,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/preloader.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="50" column="62" selection-start-line="50" selection-start-column="62" selection-end-line="50" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.2413793">
@@ -767,14 +761,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/levels/level1.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.4482758">
-          <caret line="7" column="11" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/watcher.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -785,12 +771,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/assets/levels/level1.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.4482758">
+          <caret line="7" column="11" selection-start-line="0" selection-start-column="0" selection-end-line="63" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/preloader.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="51" column="54" selection-start-line="51" selection-start-column="54" selection-end-line="51" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/levels/level2.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-21.62069">
+          <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/game.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.32254463">
-          <caret line="42" column="6" selection-start-line="42" selection-start-column="6" selection-end-line="42" selection-end-column="6" />
+        <state vertical-scroll-proportion="0.44419643">
+          <caret line="263" column="24" selection-start-line="263" selection-start-column="24" selection-end-line="263" selection-end-column="24" />
           <folding>
-            <element signature="e#369#644#0" expanded="false" />
+            <element signature="e#401#676#0" expanded="false" />
           </folding>
         </state>
       </provider>

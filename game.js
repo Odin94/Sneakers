@@ -5,6 +5,8 @@ BasicGame.Game = function (game) {
 BasicGame.Game.prototype = {
 
     create: function () {
+        this.currentLevel = 1;
+
         this.setupBackground();
         this.createLevel("level1");
         this.setupPlayerIcons();
@@ -251,7 +253,20 @@ BasicGame.Game.prototype = {
     },
 
     loadNextLevel: function () {
-        window.alert("You win!");
+        this.clearLevel();
+
+        this.currentLevel++;
+        this.createLevel("level" + this.currentLevel);
+    },
+
+    clearLevel: function () {
+        this.wallPool.forEachAlive(function (x) {
+            x.destroy();
+        });
+        this.watcherPool.forEachAlive(function (x) {
+            x.destroy();
+        });
+        this.player.destroy();
     },
 
 //from gamemechanicsexplorer
@@ -319,7 +334,8 @@ BasicGame.Game.prototype = {
 
         // This just tells the engine it should update the texture cache
         this.bitmap.dirty = true;
-    },
+    }
+    ,
 
     onPlayerSpotted: function (watcher) {
         if (watcher.spotsPlayer) {
@@ -332,11 +348,13 @@ BasicGame.Game.prototype = {
             watcher.spotsPlayer = true;
             watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
         }
-    },
+    }
+    ,
 
     render: function () {
 
-    },
+    }
+    ,
 
 
     processPlayerInput: function () {
