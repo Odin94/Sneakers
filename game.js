@@ -190,19 +190,6 @@ BasicGame.Game.prototype = {
         this.spottedTimerText.anchor.setTo(0.5, 0.5);
         this.spottedTimerText.alpha = 0.75;
 
-
-        this.instructions = this.add.text(
-            this.game.width / 2,
-            this.game.height - 100,
-            'Use Arrow Keys to Move, Press Y to Fire\n' +
-            'Tapping/clicking does both',
-            {
-                font: '20px monospace', fill: '#fff', align: 'center'
-            }
-        );
-        this.instructions.anchor.setTo(0.5, 0.5);
-        this.instExpire = this.time.now + BasicGame.INSTRUCTION_EXPIRE;
-
         this.angleDiffText = this.add.text(
             this.game.width / 2, 30, '',
             {font: '20px monospace', fill: '#fff', align: 'center'}
@@ -318,9 +305,9 @@ BasicGame.Game.prototype = {
             } else {
                 // This watcher can see the player so change their color
                 watcher.tint = 0xffaaaa;
-                this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
+                /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
                 this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
-                this.watcherAngleText.text = "watcherAngle: " + watcher.angle;
+                this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
 
                 // Draw a line from the ball to the watcher
                 this.bitmap.context.beginPath();
@@ -339,7 +326,7 @@ BasicGame.Game.prototype = {
 
     onPlayerSpotted: function (watcher) {
         if (watcher.spotsPlayer) {
-            this.spottedTimerText.text = (Math.round((this.time.now - watcher.spotTimer) / 1000 * 100) / 100).toFixed(2);
+            this.spottedTimerText.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
             if (watcher.spotTimer < this.time.now) {
                 this.player.x = this.game.width / 2;
                 this.player.y = this.game.height - 50;
@@ -376,36 +363,11 @@ BasicGame.Game.prototype = {
             this.physics.arcade.distanceToPointer(this.player) > 15) {
             this.physics.arcade.moveToPointer(this.player, this.player.speed);
         }
-
-        if (this.input.keyboard.isDown(Phaser.Keyboard.Y) ||
-            this.input.activePointer.isDown) {
-            if (this.returnText && this.returnText.exists) {
-                this.quitGame();
-            }
-        }
     }
     ,
 
 
     processDelayedEffects: function () {
-        if (this.instructions.exists && this.time.now > this.instExpire) {
-            this.instructions.destroy();
-        }
-
-        if (this.ghostUntil && this.ghostUntil < this.time.now) {
-            this.ghostUntil = null;
-            this.player.play('fly');
-        }
-
-        if (this.showReturn && this.time.now > this.showReturn) {
-            this.returnText = this.add.text(
-                this.game.width / 2, this.game.height / 2 + 20,
-                'Press Z or Tap Game to go back to Main Menu',
-                {font: '16px sans-serif', fill: '#fff'}
-            );
-            this.returnText.anchor.setTo(0.5, 0.5);
-            this.showReturn = false;
-        }
     }
     ,
 
@@ -415,9 +377,7 @@ BasicGame.Game.prototype = {
         // Stop music, delete sprites, purge caches, free resources, all that good stuff.
         this.ground.destroy();
         this.player.destroy();
-        this.instructions.destroy();
         this.angleDiffText.destroy();
-        this.returnText.destroy();
 
         // Then let's go back to the main menu.
         this.state.start('MainMenu');
