@@ -1,0 +1,5 @@
+> add switches that move/delete/add walls
+> add walls that raise/lower
+> add second player / map
+> add main menue
+> do something reasonable after completing all levels instead of just freezing
