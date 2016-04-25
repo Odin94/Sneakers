@@ -36,6 +36,7 @@ BasicGame.Game.prototype = {
     update: function () {
         this.checkCollisions();
         this.updateWatchers();
+        this.updateDisappearingWalls();
         this.processPlayerInput();
         this.processDelayedEffects();
     },
@@ -77,6 +78,12 @@ BasicGame.Game.prototype = {
                 this.spawnWall(j, wall.startY);
             }
         }
+
+        //setup disappearingWalls
+        this.disappearingWallPool = this.add.group();
+        this.disappearingWallPool.createMultiple(BasicGame.MAX_DISAPPEARING_WALL_COUNT);
+
+        this.spawnDisappearingWall(1, 1);
     },
 
     spawnWall: function (x, y) {
@@ -84,6 +91,21 @@ BasicGame.Game.prototype = {
             var wall = this.wallPool.getFirstExists(false);
 
             wall.reset(x * BasicGame.WALL_WIDTH, y * BasicGame.WALL_HEIGHT);
+            return wall;
+        }
+    },
+
+    spawnDisappearingWall: function (x, y) {
+        if (this.disappearingWallPool.countDead() > 0
+            && this.wallPool.countDead() > 0) {
+
+            var disWall = this.disappearingWallPool.getFirstExists(false);
+            disWall.reset(x, y);
+
+            var wall = this.spawnWall(x, y);
+            DisappearingWall.setDisWall(disWall, wall, Phaser.Timer.SECOND * 1, Phaser.Timer.SECOND * 1);
+
+            return disWall;
         }
     },
 
@@ -232,6 +254,12 @@ BasicGame.Game.prototype = {
         }, this);
     },
 
+    updateDisappearingWalls: function() {
+        this.disappearingWallPool.forEachAlive(function (disWall) {
+            DisappearingWall.changeAppearance(disWall, this);
+        }, this);
+    },
+
     checkCollisions: function () {
         this.physics.arcade.collide(this.player, this.wallPool);
         this.physics.arcade.overlap(
@@ -306,8 +334,8 @@ BasicGame.Game.prototype = {
                 // This watcher can see the player so change their color
                 watcher.tint = 0xffaaaa;
                 /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
-                this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
-                this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
+                 this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
+                 this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
 
                 // Draw a line from the ball to the watcher
                 this.bitmap.context.beginPath();

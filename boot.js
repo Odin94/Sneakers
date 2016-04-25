@@ -1,5 +1,6 @@
 var BasicGame = {
-    MAX_WALL_COUNT: 50,
+    MAX_WALL_COUNT: 100,
+    MAX_DISAPPEARING_WALL_COUNT: 100,
     WALL_WIDTH: 32,
     WALL_HEIGHT: 32,
 
