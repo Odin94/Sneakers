@@ -1,10 +1,9 @@
 > add switches that move/delete/add walls
-> load raise/lower walls from file (and delete them on new-lvl)
-> maybe change behavior of walls that spawn into the player
 > add second player / map
 > add main menue
 > do something reasonable after completing all levels instead of just freezing
-
+> make more backgrounds and load them from the JSON level-files
 
 done:
 > add walls that raise/lower
+> load raise/lower walls from file (and delete them on new-lvl)

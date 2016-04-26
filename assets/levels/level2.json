@@ -39,6 +39,7 @@
       "endX": 15
     }
   ],
+  "disappearingWalls": [],
   "watchers": [
     {
       "x": 6,
@@ -60,7 +61,6 @@
         }
       ]
     },
-
     {
       "x": 12,
       "y": 8,

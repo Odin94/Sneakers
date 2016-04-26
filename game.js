@@ -7,7 +7,6 @@ BasicGame.Game.prototype = {
     create: function () {
         this.currentLevel = 1;
 
-        this.setupBackground();
         this.createLevel("level1");
         this.setupPlayerIcons();
         this.setupText();
@@ -24,9 +23,18 @@ BasicGame.Game.prototype = {
          * @param levelData.walls.startX
          * @param levelData.walls.endX
          * @param levelData.walls.startY
+         * @param levelData.disappearingWalls
+         * @param levelData.disappearingWalls.startX
+         * @param levelData.disappearingWalls.endX
+         * @param levelData.disappearingWalls.startY
+         * @param levelData.disappearingWalls.appearTime
+         * @param levelData.disappearingWalls.disappearTime
          * @param levelData.watchers
          */
         this.levelData = JSON.parse(this.game.cache.getText(filename));
+
+        //set background; TODO: make more backgrounds and load them from the JSON level-files
+        this.ground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'ground');
 
         this.setupMap();
         this.setupWatchers();
@@ -39,10 +47,6 @@ BasicGame.Game.prototype = {
         this.updateDisappearingWalls();
         this.processPlayerInput();
         this.processDelayedEffects();
-    },
-
-    setupBackground: function () {
-        this.ground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'ground');
     },
 
     setupMap: function () {
@@ -59,31 +63,48 @@ BasicGame.Game.prototype = {
         this.physics.enable(this.goal, Phaser.Physics.ARCADE);
     },
 
+    //maybe split this function up for all sub-walls?
     setupWalls: function () {
+        var i, j = undefined;
+
         this.wallPool = this.add.group();
         this.wallPool.enableBody = true;
         this.wallPool.physicsBodyType = Phaser.Physics.ARCADE;
         this.wallPool.createMultiple(BasicGame.MAX_WALL_COUNT, 'wall1');
-        /* this.wallPool.setAll('anchor.x', 0.5); //this breaks the ray casting algorithm
-         this.wallPool.setAll('anchor.y', 0.5);*/
+        // this.wallPool.setAll('anchor.x', 0.5); //this breaks the ray casting algorithm
         this.wallPool.forEach(function (wall) {
             wall.body.immovable = true;
         });
 
         var walls = this.levelData.walls;
 
-        for (var i = 0; i < walls.length; i++) {
+        for (i = 0; i < walls.length; i++) {
             var wall = walls[i];
-            for (var j = wall.startX; j < wall.endX; j++) {
+            for (j = wall.startX; j <= wall.endX; j++) {
                 this.spawnWall(j, wall.startY);
             }
         }
 
         //setup disappearingWalls
+        var disappearingWalls = this.levelData.disappearingWalls;
+
         this.disappearingWallPool = this.add.group();
         this.disappearingWallPool.createMultiple(BasicGame.MAX_DISAPPEARING_WALL_COUNT);
+        for (i = 0; i < disappearingWalls.length; i++) {
+            var disWall = disappearingWalls[i];
+            for (j = disWall.startX; j <= disWall.endX; j++) {
+                this.spawnDisappearingWall(j, disWall.startY);
+            }
+        }
 
-        this.spawnDisappearingWall(1, 1);
+
+        //setup pressurePlates
+        this.pressurePlatePool = this.add.group();
+        this.pressurePlatePool.enableBody = true;
+        this.pressurePlatePool.physicsBodyType = Phaser.Physics.ARCADE;
+        this.pressurePlatePool.createMultiple(BasicGame.MAX_PRESSURE_PLATE_COUNT, 'pressure_plate');
+
+        this.spawnPressurePlate(0, 0, 0, 3);
     },
 
     spawnWall: function (x, y) {
@@ -103,9 +124,23 @@ BasicGame.Game.prototype = {
             disWall.reset(x, y);
 
             var wall = this.spawnWall(x, y);
-            DisappearingWall.setDisWall(disWall, wall, Phaser.Timer.SECOND * 1, Phaser.Timer.SECOND * 1);
+            DisappearingWall.setDisWall(disWall, wall, Phaser.Timer.SECOND, Phaser.Timer.SECOND);
 
             return disWall;
+        }
+    },
+
+    spawnPressurePlate: function (pressurePlateX, pressurePlateY, wallX, wallY) {
+        if (this.pressurePlatePool.countDead() > 0
+            && this.wallPool.countDead() > 0) {
+
+            var presPlate = this.pressurePlatePool.getFirstExists(false);
+            presPlate.reset(pressurePlateX, pressurePlateY);
+
+            var wall = this.spawnWall(wallX, wallY);
+            PressurePlate.setPressurePlate(presPlate, wall);
+
+            return presPlate;
         }
     },
 
@@ -254,7 +289,7 @@ BasicGame.Game.prototype = {
         }, this);
     },
 
-    updateDisappearingWalls: function() {
+    updateDisappearingWalls: function () {
         this.disappearingWallPool.forEachAlive(function (disWall) {
             DisappearingWall.changeAppearance(disWall, this);
         }, this);
@@ -265,6 +300,17 @@ BasicGame.Game.prototype = {
         this.physics.arcade.overlap(
             this.player, this.goal, this.loadNextLevel, null, this
         );
+
+        //TODO: reconsider if this really belongs here; it's not a collision but more of a collision-based trigger I think
+        var self = this;
+        this.pressurePlatePool.forEachAlive(function (presPlate) {
+            self.physics.arcade.overlap(
+                self.player, presPlate, function () {
+                    PressurePlate.trigger(presPlate);
+                }, null, presPlate
+            );
+        });
+
     },
 
     loadNextLevel: function () {
@@ -275,6 +321,9 @@ BasicGame.Game.prototype = {
     },
 
     clearLevel: function () {
+        this.disappearingWallPool.forEachAlive(function (x) {
+            x.destroy();
+        });
         this.wallPool.forEachAlive(function (x) {
             x.destroy();
         });
