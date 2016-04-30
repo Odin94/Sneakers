@@ -1,0 +1,80 @@
+{
+  "playerSpawn": {
+    "x": 400,
+    "y": 551
+  },
+  "goal": {
+    "x": 400,
+    "y": 50
+  },
+  "walls": [
+    {
+      "startX": 0,
+      "startY": 14,
+      "endX": 6
+    },
+    {
+      "startX": 9,
+      "startY": 14,
+      "endX": 14
+    },
+    {
+      "startX": 3,
+      "startY": 9,
+      "endX": 8
+    },
+    {
+      "startX": 12,
+      "startY": 9,
+      "endX": 18
+    },
+    {
+      "startX": 5,
+      "startY": 6,
+      "endX": 18
+    },
+    {
+      "startX": 5,
+      "startY": 3,
+      "endX": 15
+    }
+  ],
+  "disappearingWalls": [
+    {
+      "startX": 1,
+      "startY": 1,
+      "endX": 2,
+      "appearTime": 1000,
+      "disappearTime": 1000
+    },
+    {
+      "startX": 1,
+      "startY": 2,
+      "endX": 3,
+      "appearTime": 1000,
+      "disappearTime": 1000
+    }
+  ],
+  "watchers": [
+    {
+      "x": 6,
+      "y": 8,
+      "patrolActions": [
+        {
+          "type": "move",
+          "destX": 400,
+          "destY": 256
+        },
+        {
+          "type": "turn",
+          "degree": 180
+        },
+        {
+          "type": "move",
+          "destX": 192,
+          "destY": 256
+        }
+      ]
+    }
+  ]
+}
