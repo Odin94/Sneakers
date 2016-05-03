@@ -1,6 +1,10 @@
 {
-  "playerSpawn": {
-    "x": 400,
+  "player1Spawn": {
+    "x": 300,
+    "y": 551
+  },
+  "player2Spawn": {
+    "x": 500,
     "y": 551
   },
   "goal": {

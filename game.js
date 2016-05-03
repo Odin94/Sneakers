@@ -8,7 +8,7 @@ BasicGame.Game.prototype = {
         this.currentLevel = 1;
 
         this.createLevel("level1");
-        this.setupPlayerIcons();
+        this.setupplayer1Icons();
         this.setupText();
         this.setupLines();
 
@@ -18,7 +18,8 @@ BasicGame.Game.prototype = {
     createLevel: function (filename) {
         /**
          * @param levelData
-         * @param levelData.playerSpawn
+         * @param levelData.player1Spawn
+         * @param levelData.player2Spawn
          * @param levelData.walls
          * @param levelData.walls.startX
          * @param levelData.walls.endX
@@ -38,14 +39,20 @@ BasicGame.Game.prototype = {
 
         this.setupMap();
         this.setupWatchers();
-        this.setupPlayer();
+        this.setupText();
+
+        this.player1 = this.add.sprite(this.levelData.player1Spawn.x, this.levelData.player1Spawn.y, 'player');
+        this.player2 = this.add.sprite(this.levelData.player2Spawn.x, this.levelData.player2Spawn.y, 'player');
+        this.setupplayer(this.player1);
+        this.setupplayer(this.player2);
     },
 
     update: function () {
         this.checkCollisions();
         this.updateWatchers();
         this.updateDisappearingWalls();
-        this.processPlayerInput();
+        this.processplayer1Input();
+        this.processplayer2Input();
         this.processDelayedEffects();
     },
 
@@ -201,23 +208,22 @@ BasicGame.Game.prototype = {
         return closestIntersection;
     },
 
-    setupPlayer: function () {
-        this.player = this.add.sprite(this.levelData.playerSpawn.x, this.levelData.playerSpawn.y, 'player');
-        this.player.anchor.setTo(0.5, 0.5);
+    setupplayer: function (player) {
+        player.anchor.setTo(0.5, 0.5);
 
-        this.player.animations.add('fly', [0, 1, 2], 20, true);
-        this.player.animations.add('ghost', [3, 0, 3, 1], 20, true);
-        this.player.play('fly');
+        player.animations.add('fly', [0, 1, 2], 20, true);
+        player.animations.add('ghost', [3, 0, 3, 1], 20, true);
+        player.play('fly');
 
-        this.physics.enable(this.player, Phaser.Physics.ARCADE);
-        this.player.speed = BasicGame.PLAYER_SPEED;
-        this.player.body.collideWorldBounds = true;
+        this.physics.enable(player, Phaser.Physics.ARCADE);
+        player.speed = BasicGame.PLAYER_SPEED;
+        player.body.collideWorldBounds = true;
         // 20 x 20 pixel hitbox, centered a little bit higher than the center
-        this.player.body.setSize(20, 20, 0, -5);
+        player.body.setSize(20, 20, 0, -5);
     }
     ,
 
-    setupPlayerIcons: function () {
+    setupplayer1Icons: function () {
         this.powerUpPool = this.add.group();
         this.powerUpPool.enableBody = true;
         this.powerUpPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -232,7 +238,7 @@ BasicGame.Game.prototype = {
         // calculate location of first life icon
         var firstLifeIconX = this.game.width - 10 - (BasicGame.PLAYER_EXTRA_LIVES * 30);
         for (var i = 0; i < BasicGame.PLAYER_EXTRA_LIVES; i++) {
-            var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player');
+            var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player1');
             life.scale.setTo(0.5, 0.5);
             life.anchor.setTo(0.5, 0.5);
         }
@@ -296,16 +302,24 @@ BasicGame.Game.prototype = {
     },
 
     checkCollisions: function () {
-        this.physics.arcade.collide(this.player, this.wallPool);
+        this.physics.arcade.collide(this.player1, this.wallPool);
+        this.physics.arcade.collide(this.player2, this.wallPool);
+
         this.physics.arcade.overlap(
-            this.player, this.goal, this.loadNextLevel, null, this
+            this.player1, this.goal, this.loadNextLevel, null, this
         );
 
         //TODO: reconsider if this really belongs here; it's not a collision but more of a collision-based trigger I think
         var self = this;
         this.pressurePlatePool.forEachAlive(function (presPlate) {
             self.physics.arcade.overlap(
-                self.player, presPlate, function () {
+                self.player1, presPlate, function () {
+                    PressurePlate.trigger(presPlate);
+                }, null, presPlate
+            );
+
+            self.physics.arcade.overlap(
+                self.player2, presPlate, function () {
                     PressurePlate.trigger(presPlate);
                 }, null, presPlate
             );
@@ -330,7 +344,8 @@ BasicGame.Game.prototype = {
         this.watcherPool.forEachAlive(function (x) {
             x.destroy();
         });
-        this.player.destroy();
+        this.player1.destroy();
+        this.player2.destroy();
     },
 
 //from gamemechanicsexplorer
@@ -339,16 +354,16 @@ BasicGame.Game.prototype = {
         this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
 
         // Ray casting!
-        // Test if each person can see the ball by casting a ray (a line) towards the ball.
-        // If the ray intersects any walls before it intersects the ball then the wall
+        // Test if each watcher can see the player by casting a ray (a line) towards the player.
+        // If the ray intersects any walls before it intersects the player then the wall
         // is in the way.
         this.watcherPool.forEach(function (watcher) {
-            // Define a line that connects the watcher to the ball
+            // Define a line that connects the watcher to the player
             // This isn't drawn on screen. This is just mathematical representation
             // of a line to make our calculations easier. Unless you want to do a lot
             // of math, make sure you choose an engine that has things like line intersection
             // tests built in, like Phaser does.
-            var ray = new Phaser.Line(watcher.x, watcher.y, this.player.x, this.player.y);
+            var ray = new Phaser.Line(watcher.x, watcher.y, this.player1.x, this.player1.y);
 
 
             var rayAngle = Phaser.Math.radToDeg(ray.angle); //line.angle is in radians
@@ -358,7 +373,7 @@ BasicGame.Game.prototype = {
                 rayAngle = rayAngle + 360;
             }
 
-            // Angle of where the watcher looks compared to player position; looking str8 @ u = 0°
+            // Angle of where the watcher looks compared to player1 position; looking str8 @ u = 0°
             // right behind is +/- 180°
             var visionAngleDiff = (rayAngle - watcher.angle) - 90;
 
@@ -369,30 +384,30 @@ BasicGame.Game.prototype = {
 
             var intersect = this.getWallIntersection(ray);
 
-            // if player isn't in watcher's cone of vision, return
+            // if player1 isn't in watcher's cone of vision, return
             if (intersect || !(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
                 watcher.tint = 0xffffff;
 
-                if (watcher.spotsPlayer) {
-                    watcher.spotsPlayer = false;
+                if (watcher.spotsplayer1) {
+                    watcher.spotsplayer1 = false;
                     this.spottedTimerText.text = "";
                 }
 
                 return null;
             } else {
-                // This watcher can see the player so change their color
+                // This watcher can see the player1 so change their color
                 watcher.tint = 0xffaaaa;
                 /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
                  this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
                  this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
 
-                // Draw a line from the ball to the watcher
+                // Draw a line from the player to the watcher
                 this.bitmap.context.beginPath();
                 this.bitmap.context.moveTo(watcher.x, watcher.y);
-                this.bitmap.context.lineTo(this.player.x, this.player.y);
+                this.bitmap.context.lineTo(this.player1.x, this.player1.y);
                 this.bitmap.context.stroke();
 
-                this.onPlayerSpotted(watcher);
+                this.onplayer1Spotted(watcher);
             }
         }, this);
 
@@ -401,15 +416,15 @@ BasicGame.Game.prototype = {
     }
     ,
 
-    onPlayerSpotted: function (watcher) {
-        if (watcher.spotsPlayer) {
+    onplayer1Spotted: function (watcher) {
+        if (watcher.spotsplayer1) {
             this.spottedTimerText.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
             if (watcher.spotTimer < this.time.now) {
-                this.player.x = this.game.width / 2;
-                this.player.y = this.game.height - 50;
+                this.player1.x = this.game.width / 2;
+                this.player1.y = this.game.height - 50;
             }
         } else {
-            watcher.spotsPlayer = true;
+            watcher.spotsplayer1 = true;
             watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
         }
     }
@@ -421,24 +436,42 @@ BasicGame.Game.prototype = {
     ,
 
 
-    processPlayerInput: function () {
-        this.player.body.velocity.x = 0;
-        this.player.body.velocity.y = 0;
+    processplayer1Input: function () {
+        this.player1.body.velocity.x = 0;
+        this.player1.body.velocity.y = 0;
 
-        if (this.cursors.left.isDown || this.input.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.body.velocity.x = -this.player.speed;
-        } else if (this.cursors.right.isDown || this.input.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.body.velocity.x = this.player.speed;
+        if (this.cursors.left.isDown) {
+            this.player1.body.velocity.x = -this.player1.speed;
+        } else if (this.cursors.right.isDown) {
+            this.player1.body.velocity.x = this.player1.speed;
         }
 
-        if (this.cursors.up.isDown || this.input.keyboard.isDown(Phaser.Keyboard.W)) {
-            this.player.body.velocity.y = -this.player.speed;
-        } else if (this.cursors.down.isDown || this.input.keyboard.isDown(Phaser.Keyboard.S)) {
-            this.player.body.velocity.y = this.player.speed;
+        if (this.cursors.up.isDown) {
+            this.player1.body.velocity.y = -this.player1.speed;
+        } else if (this.cursors.down.isDown) {
+            this.player1.body.velocity.y = this.player1.speed;
         }
         if (this.input.activePointer.isDown &&
-            this.physics.arcade.distanceToPointer(this.player) > 15) {
-            this.physics.arcade.moveToPointer(this.player, this.player.speed);
+            this.physics.arcade.distanceToPointer(this.player1) > 15) {
+            this.physics.arcade.moveToPointer(this.player1, this.player1.speed);
+        }
+    }
+    ,
+
+    processplayer2Input: function () {
+        this.player2.body.velocity.x = 0;
+        this.player2.body.velocity.y = 0;
+
+        if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
+            this.player2.body.velocity.x = -this.player2.speed;
+        } else if (this.input.keyboard.isDown(Phaser.Keyboard.D)) {
+            this.player2.body.velocity.x = this.player2.speed;
+        }
+
+        if (this.input.keyboard.isDown(Phaser.Keyboard.W)) {
+            this.player2.body.velocity.y = -this.player2.speed;
+        } else if (this.input.keyboard.isDown(Phaser.Keyboard.S)) {
+            this.player2.body.velocity.y = this.player2.speed;
         }
     }
     ,
@@ -453,7 +486,7 @@ BasicGame.Game.prototype = {
         // Here you should destroy anything you no longer need.
         // Stop music, delete sprites, purge caches, free resources, all that good stuff.
         this.ground.destroy();
-        this.player.destroy();
+        this.player1.destroy();
         this.angleDiffText.destroy();
 
         // Then let's go back to the main menu.

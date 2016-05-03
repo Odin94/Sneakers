@@ -1,9 +1,12 @@
-> add switches that move/delete/add walls
-> add second player / map
+> let watchers/goal/triggers interact with 2nd player
+> put wall between player1 and 2 in new level
 > add main menue
 > do something reasonable after completing all levels instead of just freezing
 > make more backgrounds and load them from the JSON level-files
+> better actor sprites
 
 done:
 > add walls that raise/lower
 > load raise/lower walls from file (and delete them on new-lvl)
+> add switches that move/delete/add walls
+> add second player
