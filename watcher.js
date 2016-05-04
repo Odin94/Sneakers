@@ -20,7 +20,8 @@ var Watcher = {
 
         watcher.patrolStatus = "waiting";
 
-        watcher.spotsPlayer = false;
+        watcher.spotsPlayer1 = false;
+        watcher.spotsPlayer2 = false;
         watcher.spotTimer = 0;
     },
 

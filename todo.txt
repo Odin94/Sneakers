@@ -1,5 +1,6 @@
 > let watchers/goal/triggers interact with 2nd player
 > put wall between player1 and 2 in new level
+> allow wall extension along y axis in lvl-json
 > add main menue
 > do something reasonable after completing all levels instead of just freezing
 > make more backgrounds and load them from the JSON level-files

@@ -7,7 +7,7 @@ var Action = {
         this.y = y;
 
         this.execute = function (watcher) {
-            Watcher.turnAndMoveToPos(watcher, x, y);
+            Watcher.turnAndMoveToPos(watcher, x * BasicGame.WALL_WIDTH, y * BasicGame.WALL_HEIGHT);
         };
     },
 

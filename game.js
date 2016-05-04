@@ -31,6 +31,7 @@ BasicGame.Game.prototype = {
          * @param levelData.disappearingWalls.appearTime
          * @param levelData.disappearingWalls.disappearTime
          * @param levelData.watchers
+         * @param levelData.goal
          */
         this.levelData = JSON.parse(this.game.cache.getText(filename));
 
@@ -49,6 +50,7 @@ BasicGame.Game.prototype = {
 
     update: function () {
         this.checkCollisions();
+        this.checkGoals();
         this.updateWatchers();
         this.updateDisappearingWalls();
         this.processplayer1Input();
@@ -64,21 +66,28 @@ BasicGame.Game.prototype = {
     setupGoals: function () {
         var goalData = this.levelData.goal;
 
-        this.goal = this.add.sprite(goalData.x, goalData.y, 'goal');
-        this.goal.anchor.setTo(0.5, 0.5);
+        this.goal1 = this.add.sprite(goalData.x1, goalData.y1, 'goal');
+        this.setGoalAttributes(this.goal1);
 
-        this.physics.enable(this.goal, Phaser.Physics.ARCADE);
+        this.goal2 = this.add.sprite(goalData.x2, goalData.y2, 'goal');
+        this.setGoalAttributes(this.goal2);
+    },
+
+    setGoalAttributes: function (goal) {
+        goal.touchedByPlayer = false;
+        goal.anchor.setTo(0.5, 0.5);
+        this.physics.enable(goal, Phaser.Physics.ARCADE);
     },
 
     //maybe split this function up for all sub-walls?
     setupWalls: function () {
-        var i, j = undefined;
+        var i, j, k = undefined;
 
         this.wallPool = this.add.group();
         this.wallPool.enableBody = true;
         this.wallPool.physicsBodyType = Phaser.Physics.ARCADE;
         this.wallPool.createMultiple(BasicGame.MAX_WALL_COUNT, 'wall1');
-        // this.wallPool.setAll('anchor.x', 0.5); //this breaks the ray casting algorithm
+
         this.wallPool.forEach(function (wall) {
             wall.body.immovable = true;
         });
@@ -87,8 +96,17 @@ BasicGame.Game.prototype = {
 
         for (i = 0; i < walls.length; i++) {
             var wall = walls[i];
+            if (typeof wall.endX === 'undefined') {
+                wall.endX = wall.startX;
+            }
+            if (typeof wall.endY === 'undefined') {
+                wall.endY = wall.startY;
+            }
+
             for (j = wall.startX; j <= wall.endX; j++) {
-                this.spawnWall(j, wall.startY);
+                for (k = wall.startY; k <= wall.endY; k++) {
+                    this.spawnWall(j, k);
+                }
             }
         }
 
@@ -103,7 +121,6 @@ BasicGame.Game.prototype = {
                 this.spawnDisappearingWall(j, disWall.startY);
             }
         }
-
 
         //setup pressurePlates
         this.pressurePlatePool = this.add.group();
@@ -305,8 +322,16 @@ BasicGame.Game.prototype = {
         this.physics.arcade.collide(this.player1, this.wallPool);
         this.physics.arcade.collide(this.player2, this.wallPool);
 
+        var self = this;
         this.physics.arcade.overlap(
-            this.player1, this.goal, this.loadNextLevel, null, this
+            this.player1, this.goal1, function () {
+                self.goal1.touchedByPlayer = true
+            }, null, this
+        );
+        this.physics.arcade.overlap(
+            this.player2, this.goal2, function () {
+                self.goal2.touchedByPlayer = true
+            }, null, this
         );
 
         //TODO: reconsider if this really belongs here; it's not a collision but more of a collision-based trigger I think
@@ -325,6 +350,16 @@ BasicGame.Game.prototype = {
             );
         });
 
+    },
+
+    checkGoals: function () {
+        if (this.goal1.touchedByPlayer && this.goal2.touchedByPlayer) {
+            this.loadNextLevel();
+        }
+        else {
+            this.goal1.touchedByPlayer = false;
+            this.goal2.touchedByPlayer = false;
+        }
     },
 
     loadNextLevel: function () {
@@ -348,67 +383,13 @@ BasicGame.Game.prototype = {
         this.player2.destroy();
     },
 
-//from gamemechanicsexplorer
     checkWatcherVision: function () {
         // Clear the bitmap where we are drawing our lines
         this.bitmap.context.clearRect(0, 0, this.game.width, this.game.height);
 
-        // Ray casting!
-        // Test if each watcher can see the player by casting a ray (a line) towards the player.
-        // If the ray intersects any walls before it intersects the player then the wall
-        // is in the way.
         this.watcherPool.forEach(function (watcher) {
-            // Define a line that connects the watcher to the player
-            // This isn't drawn on screen. This is just mathematical representation
-            // of a line to make our calculations easier. Unless you want to do a lot
-            // of math, make sure you choose an engine that has things like line intersection
-            // tests built in, like Phaser does.
-            var ray = new Phaser.Line(watcher.x, watcher.y, this.player1.x, this.player1.y);
-
-
-            var rayAngle = Phaser.Math.radToDeg(ray.angle); //line.angle is in radians
-
-            // ensure rayAngle goes from 0 -> 180 and 0 -> -180
-            if (rayAngle < 0) {
-                rayAngle = rayAngle + 360;
-            }
-
-            // Angle of where the watcher looks compared to player1 position; looking str8 @ u = 0°
-            // right behind is +/- 180°
-            var visionAngleDiff = (rayAngle - watcher.angle) - 90;
-
-            // ensure visionAngleDiff goes from 0 -> 180 and 0 -> -180
-            if (visionAngleDiff > 180) {
-                visionAngleDiff -= 360;
-            }
-
-            var intersect = this.getWallIntersection(ray);
-
-            // if player1 isn't in watcher's cone of vision, return
-            if (intersect || !(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
-                watcher.tint = 0xffffff;
-
-                if (watcher.spotsplayer1) {
-                    watcher.spotsplayer1 = false;
-                    this.spottedTimerText.text = "";
-                }
-
-                return null;
-            } else {
-                // This watcher can see the player1 so change their color
-                watcher.tint = 0xffaaaa;
-                /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
-                 this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
-                 this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
-
-                // Draw a line from the player to the watcher
-                this.bitmap.context.beginPath();
-                this.bitmap.context.moveTo(watcher.x, watcher.y);
-                this.bitmap.context.lineTo(this.player1.x, this.player1.y);
-                this.bitmap.context.stroke();
-
-                this.onplayer1Spotted(watcher);
-            }
+            this.watchForPlayer(watcher, this.player1);
+            this.watchForPlayer(watcher, this.player2);
         }, this);
 
         // This just tells the engine it should update the texture cache
@@ -416,15 +397,64 @@ BasicGame.Game.prototype = {
     }
     ,
 
+    watchForPlayer: function (watcher, player) {
+        var ray = new Phaser.Line(watcher.x, watcher.y, player.x, player.y);
+
+        var rayAngle = Phaser.Math.radToDeg(ray.angle); //line.angle is in radians
+
+        // ensure rayAngle goes from 0 -> 180 and 0 -> -180
+        if (rayAngle < 0) {
+            rayAngle = rayAngle + 360;
+        }
+
+        // Angle of where the watcher looks compared to player1 position; looking str8 @ u = 0°
+        // right behind is +/- 180°
+        var visionAngleDiff = (rayAngle - watcher.angle) - 90;
+
+        // ensure visionAngleDiff goes from 0 -> 180 and 0 -> -180
+        if (visionAngleDiff > 180) {
+            visionAngleDiff -= 360;
+        }
+
+        var intersect = this.getWallIntersection(ray);
+
+        // if player1 isn't in watcher's cone of vision, return
+        if (intersect || !(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
+            watcher.tint = 0xffffff;
+
+            if (watcher.spotsPlayer1) {
+                watcher.spotsPlayer1 = false;
+                this.spottedTimerText.text = "";
+            }
+
+            return null;
+        } else {
+            // This watcher can see the player1 so change their color
+            watcher.tint = 0xffaaaa;
+            /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
+             this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
+             this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
+
+            // Draw a line from the player to the watcher
+            this.bitmap.context.beginPath();
+            this.bitmap.context.moveTo(watcher.x, watcher.y);
+            this.bitmap.context.lineTo(player.x, player.y);
+            this.bitmap.context.stroke();
+
+            this.onplayer1Spotted(watcher);
+        }
+    },
+
+
     onplayer1Spotted: function (watcher) {
-        if (watcher.spotsplayer1) {
+        if (watcher.spotsPlayer1) {
             this.spottedTimerText.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
             if (watcher.spotTimer < this.time.now) {
                 this.player1.x = this.game.width / 2;
                 this.player1.y = this.game.height - 50;
             }
         } else {
-            watcher.spotsplayer1 = true;
+            watcher.spotsPlayer1 = true;
             watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
         }
     }
@@ -440,17 +470,18 @@ BasicGame.Game.prototype = {
         this.player1.body.velocity.x = 0;
         this.player1.body.velocity.y = 0;
 
-        if (this.cursors.left.isDown) {
+        if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player1.body.velocity.x = -this.player1.speed;
-        } else if (this.cursors.right.isDown) {
+        } else if (this.input.keyboard.isDown(Phaser.Keyboard.D)) {
             this.player1.body.velocity.x = this.player1.speed;
         }
 
-        if (this.cursors.up.isDown) {
+        if (this.input.keyboard.isDown(Phaser.Keyboard.W)) {
             this.player1.body.velocity.y = -this.player1.speed;
-        } else if (this.cursors.down.isDown) {
+        } else if (this.input.keyboard.isDown(Phaser.Keyboard.S)) {
             this.player1.body.velocity.y = this.player1.speed;
         }
+
         if (this.input.activePointer.isDown &&
             this.physics.arcade.distanceToPointer(this.player1) > 15) {
             this.physics.arcade.moveToPointer(this.player1, this.player1.speed);
@@ -462,17 +493,18 @@ BasicGame.Game.prototype = {
         this.player2.body.velocity.x = 0;
         this.player2.body.velocity.y = 0;
 
-        if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
+        if (this.cursors.left.isDown) {
             this.player2.body.velocity.x = -this.player2.speed;
-        } else if (this.input.keyboard.isDown(Phaser.Keyboard.D)) {
+        } else if (this.cursors.right.isDown) {
             this.player2.body.velocity.x = this.player2.speed;
         }
 
-        if (this.input.keyboard.isDown(Phaser.Keyboard.W)) {
+        if (this.cursors.up.isDown) {
             this.player2.body.velocity.y = -this.player2.speed;
-        } else if (this.input.keyboard.isDown(Phaser.Keyboard.S)) {
+        } else if (this.cursors.down.isDown) {
             this.player2.body.velocity.y = this.player2.speed;
         }
+
     }
     ,
 

@@ -8,8 +8,10 @@
     "y": 551
   },
   "goal": {
-    "x": 400,
-    "y": 50
+    "x1": 300,
+    "y1": 50,
+    "x2": 600,
+    "y2": 50
   },
   "walls": [
     {
@@ -66,8 +68,8 @@
       "patrolActions": [
         {
           "type": "move",
-          "destX": 400,
-          "destY": 256
+          "destX": 13,
+          "destY": 8
         },
         {
           "type": "turn",
@@ -75,8 +77,8 @@
         },
         {
           "type": "move",
-          "destX": 192,
-          "destY": 256
+          "destX": 6,
+          "destY": 8
         }
       ]
     }
