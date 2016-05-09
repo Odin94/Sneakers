@@ -15,7 +15,7 @@ var Watcher = {
         watcher.lastPosY = watcher.y;
 
         watcher.patrolActions = Action.generateActions(patrolActionsData);//[new Action.moveAction(watcher.x + 200, watcher.y), new Action.turnAction(Math.PI)
-           // , new Action.moveAction(watcher.x, watcher.y)];//[[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
+        // , new Action.moveAction(watcher.x, watcher.y)];//[[watcher.x + 200, watcher.y], [watcher.x, watcher.y]];
         watcher.patrolPosIterator = 0;
 
         watcher.patrolStatus = "waiting";
@@ -23,6 +23,14 @@ var Watcher = {
         watcher.spotsPlayer1 = false;
         watcher.spotsPlayer2 = false;
         watcher.spotTimer = 0;
+    },
+
+    update: function (watcher) {
+        if (!watcher.spotsPlayer1 && !watcher.spotsPlayer2) {
+            watcher.tint = 0xffffff;
+        }
+
+        this.patrol(watcher);
     },
 
     // if current patrol-destination has been reached, move to next patrol-destination

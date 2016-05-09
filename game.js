@@ -8,7 +8,7 @@ BasicGame.Game.prototype = {
         this.currentLevel = 1;
 
         this.createLevel("level1");
-        this.setupplayer1Icons();
+        this.setupPlayerIcons();
         this.setupText();
         this.setupLines();
 
@@ -240,7 +240,7 @@ BasicGame.Game.prototype = {
     }
     ,
 
-    setupplayer1Icons: function () {
+    setupPlayerIcons: function () {
         this.powerUpPool = this.add.group();
         this.powerUpPool.enableBody = true;
         this.powerUpPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -255,7 +255,7 @@ BasicGame.Game.prototype = {
         // calculate location of first life icon
         var firstLifeIconX = this.game.width - 10 - (BasicGame.PLAYER_EXTRA_LIVES * 30);
         for (var i = 0; i < BasicGame.PLAYER_EXTRA_LIVES; i++) {
-            var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player1');
+            var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player');
             life.scale.setTo(0.5, 0.5);
             life.anchor.setTo(0.5, 0.5);
         }
@@ -263,12 +263,21 @@ BasicGame.Game.prototype = {
     ,
 
     setupText: function () {
-        this.spottedTimerText = this.add.text(this.game.width / 2, this.game.height / 2 - 50, ""
+        // Countdown timer for reset when spotted for player1 and player2
+        this.spottedTimerText1 = this.add.text(this.game.width / 4, this.game.height / 2 - 50, ""
             , {
                 font: '60px monospace', fill: '#fff', align: 'center'
             });
-        this.spottedTimerText.anchor.setTo(0.5, 0.5);
-        this.spottedTimerText.alpha = 0.75;
+        this.spottedTimerText1.anchor.setTo(0.5, 0.5);
+        this.spottedTimerText1.alpha = 0.75;
+
+        this.spottedTimerText2 = this.add.text(this.game.width / 2 + this.game.width / 4, this.game.height / 2 - 50, ""
+            , {
+                font: '60px monospace', fill: '#fff', align: 'center'
+            });
+        this.spottedTimerText2.anchor.setTo(0.5, 0.5);
+        this.spottedTimerText2.alpha = 0.75;
+
 
         this.angleDiffText = this.add.text(
             this.game.width / 2, 30, '',
@@ -308,7 +317,7 @@ BasicGame.Game.prototype = {
 
     setWatcherMovement: function () {
         this.watcherPool.forEachAlive(function (watcher) {
-            Watcher.patrol(watcher);
+            Watcher.update(watcher);
         }, this);
     },
 
@@ -418,18 +427,20 @@ BasicGame.Game.prototype = {
 
         var intersect = this.getWallIntersection(ray);
 
-        // if player1 isn't in watcher's cone of vision, return
+        // if player isn't in watcher's cone of vision, return
         if (intersect || !(visionAngleDiff <= BasicGame.WATCHER_VISION_DEGREE && visionAngleDiff >= -BasicGame.WATCHER_VISION_DEGREE)) {
-            watcher.tint = 0xffffff;
-
-            if (watcher.spotsPlayer1) {
+            if (player == this.player1 && watcher.spotsPlayer1) {
                 watcher.spotsPlayer1 = false;
-                this.spottedTimerText.text = "";
+                this.spottedTimerText1.text = "";
+            }
+            else if (player == this.player2 && watcher.spotsPlayer2) {
+                watcher.spotsPlayer2 = false;
+                this.spottedTimerText2.text = "";
             }
 
             return null;
         } else {
-            // This watcher can see the player1 so change their color
+            // This watcher can see the player so change their color
             watcher.tint = 0xffaaaa;
             /*this.angleDiffText.text = "angleDiff: " + visionAngleDiff;
              this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
@@ -441,20 +452,42 @@ BasicGame.Game.prototype = {
             this.bitmap.context.lineTo(player.x, player.y);
             this.bitmap.context.stroke();
 
-            this.onplayer1Spotted(watcher);
+            //TODO: solve this in a more elegant way; maybe give watchers a "playersBeingSpotted"-list
+            //TODO: and check against that instead of "if player1spotted"
+            if (player == this.player1) {
+                this.onPlayer1Spotted(watcher);
+            }
+            else if (player == this.player2) {
+                this.onPlayer2Spotted(watcher);
+            }
         }
     },
 
 
-    onplayer1Spotted: function (watcher) {
+    //TODO: Unify onPlayer1Spotted and onPlayer2Spotted; having to methods do the same is super inelegant :/
+    onPlayer1Spotted: function (watcher) {
         if (watcher.spotsPlayer1) {
-            this.spottedTimerText.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
+            this.spottedTimerText1.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
             if (watcher.spotTimer < this.time.now) {
-                this.player1.x = this.game.width / 2;
-                this.player1.y = this.game.height - 50;
+                this.player1.x = this.levelData.player1Spawn.x;
+                this.player1.y = this.levelData.player1Spawn.y;
             }
         } else {
             watcher.spotsPlayer1 = true;
+            watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
+        }
+    }
+    ,
+
+    onPlayer2Spotted: function (watcher) {
+        if (watcher.spotsPlayer2) {
+            this.spottedTimerText2.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
+            if (watcher.spotTimer < this.time.now) {
+                this.player2.x = this.levelData.player2Spawn.x;
+                this.player2.y = this.levelData.player1Spawn.y;
+            }
+        } else {
+            watcher.spotsPlayer2 = true;
             watcher.spotTimer = this.time.now + BasicGame.WATCHER_SPOT_TIME;
         }
     }
