@@ -128,7 +128,7 @@ BasicGame.Game.prototype = {
         this.pressurePlatePool.physicsBodyType = Phaser.Physics.ARCADE;
         this.pressurePlatePool.createMultiple(BasicGame.MAX_PRESSURE_PLATE_COUNT, 'pressure_plate');
 
-        this.spawnPressurePlate(0, 0, 0, 3);
+        this.spawnPressurePlate(0, 0, [{x: 0, y: 3}], [{x: 3, y: 0}], true);
     },
 
     spawnWall: function (x, y) {
@@ -154,15 +154,20 @@ BasicGame.Game.prototype = {
         }
     },
 
-    spawnPressurePlate: function (pressurePlateX, pressurePlateY, wallX, wallY) {
+    spawnPressurePlate: function (pressurePlateX, pressurePlateY, killWallCoords, spawnWallCoords, permanent) {
         if (this.pressurePlatePool.countDead() > 0
             && this.wallPool.countDead() > 0) {
 
             var presPlate = this.pressurePlatePool.getFirstExists(false);
             presPlate.reset(pressurePlateX, pressurePlateY);
 
-            var wall = this.spawnWall(wallX, wallY);
-            PressurePlate.setPressurePlate(presPlate, wall);
+            var killWalls = []; //walls that are killed when plate is pressed
+
+            for (var i = 0; i < killWallCoords.length; i++) {
+                killWalls.push(this.spawnWall(killWallCoords[i].x, killWallCoords[i].y))
+            }
+
+            PressurePlate.setPressurePlate(presPlate, killWalls, spawnWallCoords, permanent);
 
             return presPlate;
         }
@@ -348,13 +353,13 @@ BasicGame.Game.prototype = {
         this.pressurePlatePool.forEachAlive(function (presPlate) {
             self.physics.arcade.overlap(
                 self.player1, presPlate, function () {
-                    PressurePlate.trigger(presPlate);
+                    PressurePlate.trigger(presPlate, self);
                 }, null, presPlate
             );
 
             self.physics.arcade.overlap(
                 self.player2, presPlate, function () {
-                    PressurePlate.trigger(presPlate);
+                    PressurePlate.trigger(presPlate, self);
                 }, null, presPlate
             );
         });

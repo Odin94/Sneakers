@@ -27,7 +27,7 @@
     {
       "startX": 12,
       "startY": 14,
-      "endX": 16
+      "endX": 19
     },
     {
       "startX": 3,
@@ -50,7 +50,15 @@
       "endX": 15
     }
   ],
-  "disappearingWalls": [],
+  "disappearingWalls": [
+    {
+      "startX": 0,
+      "startY": 6,
+      "endX": 5,
+      "appearTime": 1000,
+      "disappearTime": 1000
+    }
+  ],
   "watchers": [
     {
       "x": 6,
