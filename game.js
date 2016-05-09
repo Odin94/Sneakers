@@ -129,6 +129,8 @@ BasicGame.Game.prototype = {
         this.pressurePlatePool.createMultiple(BasicGame.MAX_PRESSURE_PLATE_COUNT, 'pressure_plate');
 
         this.spawnPressurePlate(0, 0, [{x: 0, y: 3}], [{x: 3, y: 0}], true);
+
+        this.spawnPressurePlate(15, 0, [{x: 15, y: 2}], [{x: 15, y: 1}], false);
     },
 
     spawnWall: function (x, y) {
@@ -159,7 +161,7 @@ BasicGame.Game.prototype = {
             && this.wallPool.countDead() > 0) {
 
             var presPlate = this.pressurePlatePool.getFirstExists(false);
-            presPlate.reset(pressurePlateX, pressurePlateY);
+            presPlate.reset(pressurePlateX * BasicGame.WALL_WIDTH, pressurePlateY * BasicGame.WALL_HEIGHT);
 
             var killWalls = []; //walls that are killed when plate is pressed
 
@@ -349,19 +351,25 @@ BasicGame.Game.prototype = {
         );
 
         //TODO: reconsider if this really belongs here; it's not a collision but more of a collision-based trigger I think
-        var self = this;
         this.pressurePlatePool.forEachAlive(function (presPlate) {
-            self.physics.arcade.overlap(
-                self.player1, presPlate, function () {
-                    PressurePlate.trigger(presPlate, self);
-                }, null, presPlate
-            );
+            if (self.physics.arcade.overlap(self.player1, presPlate)
+                || self.physics.arcade.overlap(self.player2, presPlate)) {
 
-            self.physics.arcade.overlap(
-                self.player2, presPlate, function () {
+                if (!presPlate.triggered) {
                     PressurePlate.trigger(presPlate, self);
-                }, null, presPlate
-            );
+                }
+            }
+            else {
+                if(presPlate.triggered) {
+                    PressurePlate.unTrigger(presPlate, self);
+                }
+            }
+
+            /*self.physics.arcade.overlap(
+             self.player1, presPlate, function () {
+             PressurePlate.trigger(presPlate, self);
+             }, null, presPlate
+             );*/
         });
 
     },

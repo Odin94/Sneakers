@@ -1,3 +1,4 @@
+> load pressure plates from level.json
 > add main menue
 > do something reasonable after completing all levels instead of just freezing
 > make more backgrounds and load them from the JSON level-files

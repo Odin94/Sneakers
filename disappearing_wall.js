@@ -14,7 +14,7 @@ var DisappearingWall = {
     },
 
     //TODO: Come up with better name for this function
-    //TODO: reference "the_game"="this" from game.js without passing it
+    //TODO: reference "the_game"="this" from game.js without passing it; should be BasicGame.game
     changeAppearance: function (disWall, the_game) {
         if(game.time.now >= disWall.nextAppearTime) {
             if(disWall.wallAlive) {
