@@ -30,10 +30,11 @@ BasicGame.Game.prototype = {
          * @param levelData.disappearingWalls.startY
          * @param levelData.disappearingWalls.appearTime
          * @param levelData.disappearingWalls.disappearTime
+         * @param levelData.pressurePlates
          * @param levelData.watchers
          * @param levelData.goal
          */
-        this.levelData = JSON.parse(this.game.cache.getText(filename));
+        this.levelData = JSON.parse(this.game.cache.getText(filename)); //first load json file in preloader!!
 
         //set background; TODO: make more backgrounds and load them from the JSON level-files
         this.ground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'ground');
@@ -128,9 +129,13 @@ BasicGame.Game.prototype = {
         this.pressurePlatePool.physicsBodyType = Phaser.Physics.ARCADE;
         this.pressurePlatePool.createMultiple(BasicGame.MAX_PRESSURE_PLATE_COUNT, 'pressure_plate');
 
-        this.spawnPressurePlate(0, 0, [{x: 0, y: 3}], [{x: 3, y: 0}], true);
+        var pressurePlates = this.levelData.pressurePlates;
 
-        this.spawnPressurePlate(15, 0, [{x: 15, y: 2}], [{x: 15, y: 1}], false);
+        for (i = 0; i < pressurePlates.length; i++) {
+            var presPlate = pressurePlates[i];
+            this.spawnPressurePlate(presPlate.x, presPlate.y, presPlate.killWallCoords
+                , presPlate.spawnWallCoords, presPlate.permanent);
+        }
     },
 
     spawnWall: function (x, y) {
@@ -155,7 +160,7 @@ BasicGame.Game.prototype = {
             return disWall;
         }
     },
-
+    // this.spawnPressurePlate(0, 0, [{x: 0, y: 3}], [{x: 3, y: 0}], true);
     spawnPressurePlate: function (pressurePlateX, pressurePlateY, killWallCoords, spawnWallCoords, permanent) {
         if (this.pressurePlatePool.countDead() > 0
             && this.wallPool.countDead() > 0) {
@@ -360,7 +365,7 @@ BasicGame.Game.prototype = {
                 }
             }
             else {
-                if(presPlate.triggered) {
+                if (presPlate.triggered) {
                     PressurePlate.unTrigger(presPlate, self);
                 }
             }

@@ -46,6 +46,42 @@
     }
   ],
   "disappearingWalls": [],
+  "pressurePlates": [
+    {
+      "x": 0,
+      "y": 0,
+      "killWallCoords": [
+        {
+          "x": 0,
+          "y": 3
+        }
+      ],
+      "spawnWallCoords": [
+        {
+          "x": 3,
+          "y": 0
+        }
+      ],
+      "permanent": true
+    },
+    {
+      "x": 15,
+      "y": 0,
+      "killWallCoords": [
+        {
+          "x": 15,
+          "y": 2
+        }
+      ],
+      "spawnWallCoords": [
+        {
+          "x": 15,
+          "y": 1
+        }
+      ],
+      "permanent": false
+    }
+  ],
   "watchers": [
     {
       "x": 6,

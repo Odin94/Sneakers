@@ -1,4 +1,4 @@
-> load pressure plates from level.json
+> add second enemy type that resets player on touch
 > add main menue
 > do something reasonable after completing all levels instead of just freezing
 > make more backgrounds and load them from the JSON level-files
@@ -10,6 +10,7 @@
 > add walls that appear when a player stands on a switch
     >> make them spawn/remove multiple walls; create mazes where one player controls the switches and the other has to move through
 
+
 done:
 > add walls that raise/lower
 > load raise/lower walls from file (and delete them on new-lvl)
@@ -18,3 +19,4 @@ done:
 > let watchers/goal/triggers interact with 2nd player
 > put wall between player1 and 2 in new level
 > allow wall extension along y axis in lvl-json
+> load pressure plates from level.json

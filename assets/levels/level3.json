@@ -20,45 +20,32 @@
       "endY": 18
     },
     {
-      "startX": 4,
-      "startY": 14,
-      "endX": 9
-    },
-    {
-      "startX": 12,
-      "startY": 14,
-      "endX": 19
-    },
-    {
-      "startX": 3,
-      "startY": 9,
-      "endX": 8
-    },
-    {
-      "startX": 12,
-      "startY": 9,
-      "endX": 18
-    },
-    {
-      "startX": 5,
-      "startY": 6,
-      "endX": 18
-    },
-    {
-      "startX": 5,
-      "startY": 3,
-      "endX": 15
-    }
-  ],
-  "disappearingWalls": [
-    {
       "startX": 0,
-      "startY": 6,
-      "endX": 5,
-      "appearTime": 1000,
-      "disappearTime": 1000
+      "endX": 8,
+      "startY": 10,
+      "endY": 10
+    },
+    {
+      "startX": 10,
+      "endX": 15,
+      "startY": 10,
+      "endY": 10
+    },
+
+    {
+      "startX": 17,
+      "endX": 25,
+      "startY": 10,
+      "endY": 10
+    },
+    {
+      "startX": 10,
+      "endX": 15,
+      "startY": 10,
+      "endY": 10
     }
   ],
+  "disappearingWalls": [],
   "pressurePlates": [],
   "watchers": [
     {
