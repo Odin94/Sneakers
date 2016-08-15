@@ -7,9 +7,10 @@
 > add lighting
 > add sounds
 > add music
-> add walls that appear when a player stands on a switch
-    >> make them spawn/remove multiple walls; create mazes where one player controls the switches and the other has to move through
 
+> add network support
+> add text overlays that tell story
+> add cutscenes of some sort (like images with scrolling paralax stuff and text b4 levels or sth)
 
 done:
 > add walls that raise/lower
@@ -20,3 +21,12 @@ done:
 > put wall between player1 and 2 in new level
 > allow wall extension along y axis in lvl-json
 > load pressure plates from level.json
+> Keep lines showing after loading new level
+> add walls that appear when a player stands on a switch
+    >> make them spawn/remove multiple walls; create mazes where one player controls the switches and the other has to move through
+
+
+Story Idea:
+> one player gets "regular" intro
+> other player is told to do specific things / make player1 do specific things for points
+> other player secretly opposes player1 some way somehow

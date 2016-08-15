@@ -8,9 +8,7 @@ BasicGame.Game.prototype = {
         this.currentLevel = 1;
 
         this.createLevel("level1");
-        this.setupPlayerIcons();
-        this.setupText();
-        this.setupLines();
+        //  this.setupPlayerIcons();  // shows the health-icons, don't really need those
 
         this.cursors = this.input.keyboard.createCursorKeys();
     },
@@ -42,6 +40,9 @@ BasicGame.Game.prototype = {
         this.setupMap();
         this.setupWatchers();
         this.setupText();
+
+        //necessary to keep showing lines after updating this.ground
+        this.setupLines();
 
         this.player1 = this.add.sprite(this.levelData.player1Spawn.x, this.levelData.player1Spawn.y, 'player');
         this.player2 = this.add.sprite(this.levelData.player2Spawn.x, this.levelData.player2Spawn.y, 'player');
@@ -397,6 +398,8 @@ BasicGame.Game.prototype = {
     },
 
     clearLevel: function () {
+        this.ground.destroy();
+
         this.disappearingWallPool.forEachAlive(function (x) {
             x.destroy();
         });
@@ -464,7 +467,7 @@ BasicGame.Game.prototype = {
              this.rayAngleText.text = "rayAngle: " + rayAngle + " / originalAngle: " + Phaser.Math.radToDeg(ray.angle);
              this.watcherAngleText.text = "watcherAngle: " + watcher.angle;*/
 
-            // Draw a line from the player to the watcher
+            // Draw a line from the watcher to the player
             this.bitmap.context.beginPath();
             this.bitmap.context.moveTo(watcher.x, watcher.y);
             this.bitmap.context.lineTo(player.x, player.y);
@@ -482,7 +485,7 @@ BasicGame.Game.prototype = {
     },
 
 
-    //TODO: Unify onPlayer1Spotted and onPlayer2Spotted; having to methods do the same is super inelegant :/
+    //TODO: Unify onPlayer1Spotted and onPlayer2Spotted; having two methods do the same is super inelegant :/
     onPlayer1Spotted: function (watcher) {
         if (watcher.spotsPlayer1) {
             this.spottedTimerText1.text = (Math.round((watcher.spotTimer - this.time.now) / 1000 * 100) / 100).toFixed(2);
