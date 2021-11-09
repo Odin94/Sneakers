@@ -1,10 +1,7 @@
-Project template project for [HTML5 Shoot 'em Up in an Afternoon](https://leanpub.com/html5shootemupinanafternoon)
+## Sneakers
 
-**Note for older versions of the book (pre-October 2014):**
+Phaser game about sneaking around patrolling guards
 
-You should use an older version of this template if you're using an older version of the book (i.e. one that does not specify the Phaser version in the Introduction).
-
-Get the older version via:
-
-    $ git clone https://github.com/bryanbibat/html5shmup-template.git
-    $ git checkout 2.0-final
+### How to run
+* Host `index.html` in a local webserver (eg. with `npx http-server`)
+* Open it in your browser (eg `http://localhost:8080` for http-server)
