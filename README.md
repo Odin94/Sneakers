@@ -1,6 +1,6 @@
 ## Sneakers
 
-Phaser game about sneaking around patrolling guards
+Phaser local coop game about sneaking around patrolling guards
 
 ### How to run
 * Host `index.html` in a local webserver (eg. with `npx http-server`)
